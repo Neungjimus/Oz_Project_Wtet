@@ -1,0 +1,82 @@
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { searchMeal, getRandomMeal } from "../api/recipeApi";
+
+function Home() {
+  const [query, setQuery] = useState("");
+  const [meals, setMeals] = useState<any[]>([]);
+  const navigate = useNavigate();
+
+  const handleSearch = async () => {
+    if (!query.trim()) return;
+    const data = await searchMeal(query);
+    setMeals(data || []);
+  };
+
+  const handleRandom = async () => {
+    const data = await getRandomMeal();
+    setMeals(data ? [data] : []);
+  };
+
+  return (
+    <div className="flex flex-col items-center mt-10 px-4">
+      <h1 className="text-3xl font-bold text-yellow-600 mb-2">
+        🍳 What To Eat
+      </h1>
+      <p className="text-gray-500 mb-6 text-center">
+        음식 이름을{" "}
+        <span className="font-semibold text-yellow-500">영어로</span>{" "}
+        검색해보세요!
+        <br />
+        예: chicken, pasta, beef, salad
+      </p>
+
+      <div className="flex gap-2 mb-6">
+        <input
+          type="text"
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+          placeholder="Search recipe..."
+          className="border rounded-lg px-4 py-2 w-60 focus:outline-none focus:ring-2 focus:ring-yellow-400"
+        />
+        <button
+          onClick={handleSearch}
+          className="bg-yellow-500 text-white px-4 py-2 rounded-lg hover:bg-yellow-600 transition"
+        >
+          검색
+        </button>
+        <button
+          onClick={handleRandom}
+          className="border border-yellow-500 text-yellow-600 px-4 py-2 rounded-lg hover:bg-yellow-50 transition"
+        >
+          랜덤 추천
+        </button>
+      </div>
+
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+        {meals.length > 0 ? (
+          meals.map((meal) => (
+            <div
+              key={meal.idMeal}
+              onClick={() => navigate(`/detail/${meal.idMeal}`)} // ← 여기에 navigate 추가
+              className="border rounded-xl overflow-hidden shadow hover:shadow-lg transition cursor-pointer"
+            >
+              <img
+                src={meal.strMealThumb}
+                alt={meal.strMeal}
+                className="w-full h-48 object-cover"
+              />
+              <div className="p-4 text-center">
+                <h3 className="font-semibold text-gray-800">{meal.strMeal}</h3>
+              </div>
+            </div>
+          ))
+        ) : (
+          <p className="text-gray-400 text-sm">검색 결과가 없습니다.</p>
+        )}
+      </div>
+    </div>
+  );
+}
+
+export default Home;
