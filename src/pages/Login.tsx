@@ -1,16 +1,16 @@
 import { useState } from "react";
 import { supabase } from "../api/supabaseClient";
+import { useNavigate } from "react-router-dom";
 
 export default function Auth() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [isLogin, setIsLogin] = useState(true); // true면 로그인, false면 회원가입
-
+  const [isLogin, setIsLogin] = useState(true);
+  const navigate = useNavigate();
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     if (isLogin) {
-      // 로그인
       const { error } = await supabase.auth.signInWithPassword({
         email,
         password,
@@ -19,10 +19,9 @@ export default function Auth() {
         alert(error.message);
       } else {
         alert("로그인 성공!");
-        window.location.reload();
+        navigate("/");
       }
     } else {
-      // 회원가입
       const { error } = await supabase.auth.signUp({
         email,
         password,
@@ -31,7 +30,7 @@ export default function Auth() {
         alert(error.message);
       } else {
         alert("회원가입 성공! 이제 로그인하세요!");
-        setIsLogin(true); // 회원가입 후 로그인 모드로 전환
+        setIsLogin(true);
       }
     }
   };

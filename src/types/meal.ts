@@ -1,4 +1,3 @@
-// src/types/meal.ts
 export interface Meal {
   idMeal: string;
   strMeal: string;

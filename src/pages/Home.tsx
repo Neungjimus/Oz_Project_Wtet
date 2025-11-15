@@ -1,27 +1,17 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { supabase } from "../api/supabaseClient";
 import { searchMeal, getRandomMeal } from "../api/recipeApi";
 import { useNavigate } from "react-router-dom";
+import { FolderHeart } from "lucide-react";
 
 function Home() {
   const navigate = useNavigate();
   const [query, setQuery] = useState("");
   const [meals, setMeals] = useState<any[]>([]);
-  const [user, setUser] = useState<any>(null);
-
-  useEffect(() => {
-    const getUser = async () => {
-      const { data } = await supabase.auth.getUser();
-      setUser(data.user);
-    };
-    getUser();
-  }, []);
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
-    setUser(null);
     alert("로그아웃 되었습니다.");
-    window.location.reload();
   };
 
   const handleSearch = async () => {
@@ -35,31 +25,27 @@ function Home() {
     setMeals([data]);
   };
 
-  if (!user) {
-    return (
-      <div className="flex flex-col items-center mt-10">
-        <h1 className="text-3xl font-bold mb-3">🍳 What To Eat</h1>
-        <p className="text-gray-500 mb-6">로그인 후 이용할 수 있습니다.</p>
-        <button
-          onClick={() => navigate("/login")}
-          className="bg-yellow-500 text-white px-4 py-2 rounded-lg hover:bg-yellow-600"
-        >
-          로그인 하러가기
-        </button>
-      </div>
-    );
-  }
-
   return (
     <div className="flex flex-col items-center mt-10 px-4">
-      <div className="flex justify-between w-full max-w-2xl mb-4">
+      <div className="flex justify-between w-full max-w-2xl mb-6 items-center">
         <h1 className="text-3xl font-bold text-yellow-600">🍳 What To Eat</h1>
-        <button
-          onClick={handleLogout}
-          className="text-sm text-gray-500 hover:text-gray-800"
-        >
-          로그아웃
-        </button>
+
+        <div className="flex gap-3 items-center">
+          <button
+            onClick={() => navigate("/favorites")}
+            className="text-sm flex items-center gap-1 text-yellow-600 hover:text-yellow-700"
+          >
+            <FolderHeart size={18} />
+            즐겨찾기
+          </button>
+
+          <button
+            onClick={handleLogout}
+            className="text-sm text-gray-500 hover:text-gray-800"
+          >
+            로그아웃
+          </button>
+        </div>
       </div>
 
       <p className="text-gray-500 mb-6 text-center">
@@ -78,12 +64,14 @@ function Home() {
           placeholder="Search recipe..."
           className="border rounded-lg px-4 py-2 w-60 focus:outline-none focus:ring-2 focus:ring-yellow-400"
         />
+
         <button
           onClick={handleSearch}
           className="bg-yellow-500 text-white px-4 py-2 rounded-lg hover:bg-yellow-600 transition"
         >
           검색
         </button>
+
         <button
           onClick={handleRandom}
           className="border border-yellow-500 text-yellow-600 px-4 py-2 rounded-lg hover:bg-yellow-50 transition"
